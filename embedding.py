@@ -26,7 +26,7 @@ def generate_and_save_embeddings(output_file=None):
         
     with torch.no_grad():
         for func in tqdm(functions, desc="Embedding functions"):
-            inputs = tokenizer.encode(func.code_snippet, return_tensors="pt").to(device)
+            inputs = tokenizer.encode(func.code_snippet, return_tensors="pt", max_length=512, truncation=True).to(device)
             embedding = model(inputs)[0]
             # 这里将 embedding 放到 CPU 并保存以避免 GPU 内存打满，并确保能正常被 pickle 序列化
             func.embedding = embedding.cpu()
