@@ -12,7 +12,7 @@ CUDA 版本：12.1
 
 ```
 pip3 install torch torchvision torchaudio --index-url https://mirrors.nju.edu.cn/pytorch/whl/cu121 # 安装 PyTorch
-conda install -c pytorch -c nvidia -c conda-forge faiss-gpu=1.14.1 # 安装 FAISS
+conda install -y -c pytorch -c nvidia -c conda-forge faiss-gpu=1.14.1 # 安装 FAISS
 pip install -r requirements.txt # 安装其他依赖
 ```
 
