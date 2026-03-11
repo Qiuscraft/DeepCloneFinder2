@@ -22,6 +22,10 @@ def generate_and_save_embeddings(output_file=None):
     model = AutoModel.from_pretrained(checkpoint, trust_remote_code=True).to(device)
     model.eval()
 
+    # 使用 PyTorch 2.0 的图编译加速
+    if int(torch.__version__.split('.')[0]) >= 2:
+        model = torch.compile(model)
+
     print(f"(info) [embedding] Extracting functions from files...")
     functions = extract_functions_from_files()
         
@@ -54,7 +58,14 @@ def generate_and_save_embeddings(output_file=None):
         with torch.autocast("cuda"): # 开启 PyTorch 自动混合精度加速 (FP16/BF16)
             for batch_funcs in tqdm(batches, desc="Embedding functions"):
                 batch_snippets = [func.code_snippet for func in batch_funcs]
-                inputs = tokenizer(batch_snippets, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
+                inputs = tokenizer(
+                    batch_snippets, 
+                    return_tensors="pt", 
+                    padding=True, 
+                    truncation=True, 
+                    max_length=512, 
+                    pad_to_multiple_of=8
+                ).to(device)
                 
                 # 传入 **inputs 以应用 attention_mask，避免对 pad token 产生多余注意力计算和噪声
                 embeddings = model(**inputs)[0]
