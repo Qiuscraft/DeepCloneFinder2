@@ -25,14 +25,34 @@ def generate_and_save_embeddings(output_file=None):
     print(f"(info) [embedding] Extracting functions from files...")
     functions = extract_functions_from_files()
         
-    # 按代码长度排序（Smart Batching），最大限度减少填充（Padding）导致的无用算力消耗
-    sorted_functions = sorted(functions, key=lambda f: len(f.code_snippet))
+    # 按代码长度降序排序，预分配最大显存以避免碎片化，处理速度会从慢变快
+    sorted_functions = sorted(functions, key=lambda f: len(f.code_snippet), reverse=True)
         
-    batch_size = config.emb_batch_size
+    # 动态批大小：设定显存允许的基准最大 Token 面积
+    max_tokens_per_batch = config.emb_batch_size * 512
+    batches = []
+    current_batch = []
+    current_max_len = 0
+
+    for func in sorted_functions:
+        # 预估 token 长度（假设4个字符约等于1个Token，最长截断边界为512）
+        approx_tokens = min(512, len(func.code_snippet) // 4 + 1)
+        new_max_len = max(current_max_len, approx_tokens)
+        
+        # 确保 当前批次总容量 (batch_size * sequence_length) 不超过上限
+        if current_batch and new_max_len * (len(current_batch) + 1) > max_tokens_per_batch:
+            batches.append(current_batch)
+            current_batch = [func]
+            current_max_len = approx_tokens
+        else:
+            current_batch.append(func)
+            current_max_len = new_max_len
+    if current_batch:
+        batches.append(current_batch)
+
     with torch.no_grad():
         with torch.autocast("cuda"): # 开启 PyTorch 自动混合精度加速 (FP16/BF16)
-            for i in tqdm(range(0, len(sorted_functions), batch_size), desc="Embedding functions"):
-                batch_funcs = sorted_functions[i:i + batch_size]
+            for batch_funcs in tqdm(batches, desc="Embedding functions"):
                 batch_snippets = [func.code_snippet for func in batch_funcs]
                 inputs = tokenizer(batch_snippets, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
                 

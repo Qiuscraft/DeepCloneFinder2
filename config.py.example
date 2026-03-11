@@ -8,4 +8,4 @@ ef_parse_max_workers = os.cpu_count() # 并发解析文件的最大工作进程�
 ef_cache_filepath = f"./cache/function_info/{os.path.basename(os.path.expanduser(ef_dataset_path))}.pkl" # 提取结果的缓存文件路径
 
 # Embedding
-emb_batch_size = 64 # 生成embedding时的批处理大小
+emb_batch_size = 32 # 生成embedding时的批处理大小
