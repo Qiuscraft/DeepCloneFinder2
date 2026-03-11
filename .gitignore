@@ -1,0 +1,6 @@
+.vscode
+
+config.py
+
+cache
+__pycache__
