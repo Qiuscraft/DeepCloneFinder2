@@ -8,3 +8,5 @@ class FunctionInfo:
     code_snippet: str
     path: str
     embedding: np.ndarray
+    centroid: int
+    distance: float

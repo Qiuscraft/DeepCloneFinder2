@@ -6,3 +6,10 @@ ef_dataset_path = "~/BigCloneEval/ijadataset/bcb_reduced" # The Path of The Data
 ef_read_max_workers = 32 # 并发读取文件的最大工作线程数
 ef_parse_max_workers = os.cpu_count() # 并发解析文件的最大工作进程数，默认为 CPU 核心数
 ef_cache_filepath = f"./cache/function_info/{os.path.basename(os.path.expanduser(ef_dataset_path))}.pkl" # 提取结果的缓存文件路径
+
+# KMeans
+kmeans_n_centroids = 861893 // 1024 # KMeans 的簇数量
+kmeans_n_iter = 30 # KMeans 的最大迭代次数，默认为 30
+kmeans_n_redo = 3 # KMeans 的重试次数，默认为 3
+kmeans_verbose = True # 是否在 KMeans 训练过程中输出详细日志，默认为 True
+kmeans_use_gpu = True # 是否使用 GPU 加速 KMeans 训练，默认为 True，如果设置为 True 但未检测到 GPU，则会自动降级为 CPU 模式并输出警告
