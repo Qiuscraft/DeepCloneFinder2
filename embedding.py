@@ -28,11 +28,10 @@ def generate_and_save_embeddings(output_file=None):
 
     with torch.inference_mode():  
         for func in tqdm(functions, desc="Embedding functions"):  
-            # 限制输入长度防止长序列占用过多内存
             inputs = tokenizer.encode(
                 func.code_snippet, 
                 return_tensors="pt",
-                max_length=512,  # 添加长度限制
+                max_length=512,
                 truncation=True
             ).to(device)  
             
