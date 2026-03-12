@@ -112,3 +112,4 @@ if __name__ == "__main__":
             print(f"File Path: {func.path}")
             print(f"Lines: {func.start_line} - {func.end_line}")
             print(f"Code Snippet: \n{func.code_snippet}")
+            print(f"Embedding: {func.embedding}")

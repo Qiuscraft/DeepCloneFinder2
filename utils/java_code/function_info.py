@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import torch
+import numpy as np
 
 @dataclass
 class FunctionInfo:
@@ -7,4 +7,4 @@ class FunctionInfo:
     end_line: int
     code_snippet: str
     path: str
-    embedding: torch.Tensor 
+    embedding: np.ndarray
