@@ -40,13 +40,13 @@ def split_file_by_size_and_lines(
         拆分后文件路径列表
     """
     if max_file_size <= 0:
-        raise ValueError("max_file_size 必须为正整数")
+        raise ValueError("(error)[batch_upload] max_file_size must be a positive integer.")
     if max_lines <= 0:
-        raise ValueError("max_lines 必须为正整数")
+        raise ValueError("(error)[batch_upload] max_lines must be a positive integer.")
 
     input_path = Path(file_path)
     if not input_path.exists():
-        raise FileNotFoundError(f"输入文件不存在: {file_path}")
+        raise FileNotFoundError(f"(error)[batch_upload] Input file not found: {file_path}")
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -122,9 +122,9 @@ def upload_files_and_create_batches(
     for file_path in file_paths:
         file_path_obj = Path(file_path)
         if not file_path_obj.exists():
-            raise FileNotFoundError(f"输入文件不存在: {file_path}")
+            raise FileNotFoundError(f"(error)[batch_upload] Input file not found: {file_path}")
         if file_path_obj.suffix.lower() != ".jsonl":
-            raise ValueError(f"输入文件必须为 .jsonl 格式: {file_path}")
+            raise ValueError(f"(error)[batch_upload] Input file must be in .jsonl format: {file_path}")
 
         with open(file_path_obj, "rb") as f:
             file_object = client.files.create(file=f, purpose="batch")
