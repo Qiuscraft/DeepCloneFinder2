@@ -24,9 +24,9 @@ def load_batch_ids(file_path: str) -> List[str]:
 		batch_id 列表（按行读取，去除空行与首尾空白）
 	"""
 	if not file_path:
-		raise ValueError("file_path 不能为空")
+		raise ValueError("(error) [batch_download] file_path can not be empty")
 	if not os.path.isfile(file_path):
-		raise FileNotFoundError(f"文件不存在: {file_path}")
+		raise FileNotFoundError(f"(error) [batch_download] File not found: {file_path}")
 
 	with open(file_path, "r", encoding="utf-8") as file_handle:
 		return [line.strip() for line in file_handle if line.strip()]
@@ -64,11 +64,11 @@ def retrieve_batch(
 		Batch 对象（dict）
 	"""
 	if not batch_id:
-		raise ValueError("batch_id 不能为空")
+		raise ValueError("(error) [batch_download] batch_id can not be empty")
 
-	resolved_api_key = api_key or os.getenv("ZAI_API_KEY") or os.getenv("ZHIPU_API_KEY")
+	resolved_api_key = api_key
 	if not resolved_api_key:
-		raise ValueError("api_key 不能为空，或请设置 ZAI_API_KEY / ZHIPU_API_KEY 环境变量")
+		raise ValueError("(error) [batch_download] api_key can not be empty")
 
 	url = f"{base_url}/batches/{batch_id}"
 	headers = {
@@ -82,14 +82,14 @@ def retrieve_batch(
 			payload = response.read().decode("utf-8")
 	except urllib.error.HTTPError as exc:
 		error_body = exc.read().decode("utf-8") if exc.fp else ""
-		raise RuntimeError(f"请求失败: HTTP {exc.code} {exc.reason}. {error_body}") from exc
+		raise RuntimeError(f"(error) [batch_download] Request failed: HTTP {exc.code} {exc.reason}. {error_body}") from exc
 	except urllib.error.URLError as exc:
-		raise RuntimeError(f"请求失败: {exc.reason}") from exc
+		raise RuntimeError(f"(error) [batch_download] Request failed: {exc.reason}") from exc
 
 	try:
 		return json.loads(payload)
 	except json.JSONDecodeError as exc:
-		raise RuntimeError("响应不是有效的 JSON") from exc
+		raise RuntimeError(f"(error) [batch_download] Response is not valid JSON") from exc
 
 
 def get_output_file_id(
@@ -141,7 +141,7 @@ def get_output_file_ids(
 		output_file_id 列表（对应位置如不存在则为 None）
 	"""
 	if not isinstance(batch_ids, list):
-		raise ValueError("batch_ids 必须为列表")
+		raise ValueError("(error) [batch_download] batch_ids must be a list")
 	return [
 		get_output_file_id(
 			batch_id=batch_id,
@@ -176,13 +176,13 @@ def download_output_file(
 		保存的文件路径
 	"""
 	if not file_id:
-		raise ValueError("file_id 不能为空")
+		raise ValueError("(error) [batch_download] file_id can not be empty")
 	if not output_dir:
-		raise ValueError("output_dir 不能为空")
+		raise ValueError("(error) [batch_download] output_dir can not be empty")
 
-	resolved_api_key = api_key or os.getenv("ZAI_API_KEY") or os.getenv("ZHIPU_API_KEY")
+	resolved_api_key = api_key
 	if not resolved_api_key:
-		raise ValueError("api_key 不能为空，或请设置 ZAI_API_KEY / ZHIPU_API_KEY 环境变量")
+		raise ValueError("(error) [batch_download] api_key can not be empty")
 
 	os.makedirs(output_dir, exist_ok=True)
 
@@ -250,9 +250,9 @@ def download_output_files(
 		下载后的文件路径列表（对应位置如 file_id 为空则为 None）
 	"""
 	if not isinstance(file_ids, list):
-		raise ValueError("file_ids 必须为列表")
+		raise ValueError("(error) [batch_download] file_ids must be a list")
 	if not output_dir:
-		raise ValueError("output_dir 不能为空")
+		raise ValueError("(error) [batch_download] output_dir can not be empty")
 
 	results: List[Optional[str]] = []
 	for file_id in file_ids:
@@ -288,11 +288,11 @@ def merge_files_and_delete_sources(
 		输出文件路径
 	"""
 	if not isinstance(input_files, list) or not input_files:
-		raise ValueError("input_files 必须为非空列表")
+		raise ValueError("(error) [batch_download] input_files must be a non-empty list")
 	if not output_file:
-		raise ValueError("output_file 不能为空")
+		raise ValueError("(error) [batch_download] output_file can not be empty")
 	if chunk_size <= 0:
-		raise ValueError("chunk_size 必须为正数")
+		raise ValueError("(error) [batch_download] chunk_size must be a positive number")
 
 	output_dir = os.path.dirname(output_file)
 	if output_dir:
@@ -301,9 +301,9 @@ def merge_files_and_delete_sources(
 	with open(output_file, "wb") as out_handle:
 		for file_path in input_files:
 			if not file_path:
-				raise ValueError("input_files 中存在空路径")
+				raise ValueError("(error) [batch_download] input_files contains empty path")
 			if not os.path.isfile(file_path):
-				raise FileNotFoundError(f"文件不存在: {file_path}")
+				raise FileNotFoundError(f"(error) [batch_download] File not found: {file_path}")
 			with open(file_path, "rb") as in_handle:
 				while True:
 					chunk = in_handle.read(chunk_size)
@@ -318,24 +318,19 @@ def merge_files_and_delete_sources(
 
 
 if __name__ == "__main__":
-    print("开始下载文件。")
-    print("正在加载 batch_id 列表...")
+    print("(info) [batch_download] Loading batch_id list...")
     batch_ids = load_batch_ids(config.bu_batch_ids_filepath)
-    print(f"共加载 {len(batch_ids)} 个 batch_id。")
-    print("正在获取 output_file_id 列表...")
+    print("(info) [batch_download] Getting output_file_id list...")
     output_file_ids = get_output_file_ids(batch_ids)
-    print("正在下载输出文件...")
+    print("(info) [batch_download] Downloading output files...")
     downloaded_files = download_output_files(output_file_ids, config.bd_download_dir)
     successful_downloads = [f for f in downloaded_files if f]
-    print(f"共下载 {len(successful_downloads)} 个文件，保存在目录: {config.bd_download_dir}")
-    if not successful_downloads:
-        print("没有成功下载的文件，退出。")
-        exit(0)
-    print(f"正在合并文件到: {config.bd_merged_filepath} ...")
+    print(f"(info) [batch_download] Total files downloaded: {len(successful_downloads)}, Saved in directory: {config.bd_download_dir}")
+    print(f"(info) [batch_download] Merging files to: {config.bd_merged_filepath} ...")
     merge_files_and_delete_sources(successful_downloads, config.bd_merged_filepath)
     print("文件合并完成。")
-    print(f"合并后的文件保存在: {config.bd_merged_filepath}")
+    print(f"(info) [batch_download] Merged file saved in: {config.bd_merged_filepath}")
     if os.path.isdir(config.bd_download_dir):
         shutil.rmtree(config.bd_download_dir)
-        print(f"已删除目录: {config.bd_download_dir}")
+        print(f"(info) [batch_download] Deleted directory: {config.bd_download_dir}")
 		
