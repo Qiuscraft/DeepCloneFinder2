@@ -16,7 +16,7 @@ batch_ids_output_filepath = config.bu_batch_ids_filepath
 request_parts_dir = config.bu_request_parts_dir
 max_part_file_size = config.bu_max_part_file_size
 max_part_file_lines = config.bu_max_part_file_lines
-zai_api_key = config.bu_zai_api_key
+zai_api_key = config.zai_api_key
 
 
 def split_file_by_size_and_lines(

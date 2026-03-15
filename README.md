@@ -35,6 +35,7 @@ python kmeans.py
 python init_clone_classes.py
 python generate_batch_requests.py
 python batch_upload.py
+python batch_download.py
 ```
 
 ## 项目结构

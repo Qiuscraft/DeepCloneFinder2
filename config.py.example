@@ -24,9 +24,14 @@ icc_cache_filepath = f"./cache/{os.path.basename(os.path.expanduser(ef_dataset_p
 # Generate Batch Requests
 gbr_output_file = f"./batch/{os.path.basename(os.path.expanduser(ef_dataset_path))}_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.jsonl" # 生成的 JSONL 文件的输出文件路径
 
+# Zhipu API Key
+zai_api_key = os.getenv("ZAI_API_KEY", "")
+
 # Batch Upload
 bu_batch_ids_filepath = f"./batch/{os.path.basename(os.path.expanduser(ef_dataset_path))}_batch_ids_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.txt" # 批次 ID 的输出文件路径
 bu_request_parts_dir = f"./batch/requests_parts/{os.path.basename(os.path.expanduser(ef_dataset_path))}_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}" # 拆分后的请求文件的输出目录
 bu_max_part_file_size = 100 * 1024 * 1024
 bu_max_part_file_lines = 50000
-bu_zai_api_key = os.getenv("ZAI_API_KEY", "")
+
+# Batch Download
+bd_download_dir = f"./batch/downloads/{os.path.basename(os.path.expanduser(ef_dataset_path))}_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}" # 下载结果的输出目录
