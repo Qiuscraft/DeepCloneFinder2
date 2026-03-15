@@ -14,10 +14,8 @@ def read_prompt_template():
     
     return system_prompt, user_prompt_template
 
-def create_request_json(centroid_id, function_path, function_start_line, system_prompt, user_prompt):
+def create_request_json(centroid_id, function_id, system_prompt, user_prompt):
     """创建请求JSON"""
-    # 使用 path 和 start_line 作为唯一标识符
-    function_id = f"{os.path.basename(function_path)}_{function_start_line}"
     return {
         "custom_id": f"request-{centroid_id}-{function_id}",
         "method": "POST",
@@ -49,6 +47,14 @@ def main():
     with open(cache_path, "rb") as f:
         clone_classes = pickle.load(f)
         
+    print(f"正在读取 FunctionInfo 数据...")
+    with open(os.path.expanduser(config.ef_cache_filepath), "rb") as f:
+        functions = pickle.load(f)
+
+    print(f"正在读取 KMeansResult 数据...")
+    with open(os.path.expanduser(config.kmeans_cache_filepath), "rb") as f:
+        kmeans_results = pickle.load(f)
+        
     # 过滤出有效的 CloneClass 且有 suspicious_functions 的
     valid_classes = [cc for cc in clone_classes if cc is not None and cc.suspicious_functions]
     
@@ -61,7 +67,6 @@ def main():
         os.makedirs(output_dir, exist_ok=True)
     
     total_requests = sum(len(cc.suspicious_functions) for cc in valid_classes)
-    processed_count = 0
     
     print(f"\n开始生成 JSONL 文件，总请求数: {total_requests}")
     
@@ -70,19 +75,19 @@ def main():
     
     # 将嵌套循环扁平化为生成器，以便 tqdm 能够原生迭代并自动更新进度
     items_to_process = (
-        (cc.representative_function.centroid, cc.representative_function.code_snippet, susp_func)
-        for cc in valid_classes for susp_func in cc.suspicious_functions
+        (kmeans_results[cc.representative_function_id].centroid_id, functions[cc.representative_function_id].code_snippet, susp_func_id)
+        for cc in valid_classes for susp_func_id in cc.suspicious_functions
     )
     
-    for centroid_id, code_snippet_1, susp_func in tqdm(items_to_process, total=total_requests, desc="生成请求", unit="请求"):
-        code_snippet_2 = susp_func.code_snippet
+    for centroid_id, code_snippet_1, susp_func_id in tqdm(items_to_process, total=total_requests, desc="生成请求", unit="请求"):
+        code_snippet_2 = functions[susp_func_id].code_snippet
         
         # 替换用户提示模板中的占位符
         user_prompt = user_prompt_template.replace("{{code_snippet_1}}", code_snippet_1)
         user_prompt = user_prompt.replace("{{code_snippet_2}}", code_snippet_2)
         
         # 创建请求JSON
-        request_json = create_request_json(centroid_id, susp_func.path, susp_func.start_line, system_prompt, user_prompt)
+        request_json = create_request_json(centroid_id, susp_func_id, system_prompt, user_prompt)
         
         # 写入JSONL文件
         f.write(json.dumps(request_json, ensure_ascii=False) + '\n')

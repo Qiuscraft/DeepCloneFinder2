@@ -3,7 +3,7 @@ import pickle
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from typing import List
 import config
-from utils.java_code.function_info import FunctionInfo
+from utils.data_class.function_info import FunctionInfo
 from utils.java_code.java_parser import JavaParser
 
 
@@ -57,7 +57,7 @@ def _parse_single_file(args: tuple) -> List[FunctionInfo]:
         parser = JavaParser(file_path=rel_path, source_code=content)
         return parser.extract_functions()
     except Exception as e:
-        # print(f"(error) [extract_functions] Error parsing {rel_path}: {e}")
+        print(f"(error) [extract_functions] Error parsing {rel_path}: {e}")
         return []
 
 def extract_functions_from_files() -> List[FunctionInfo]:
@@ -85,7 +85,12 @@ def extract_functions_from_files() -> List[FunctionInfo]:
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         for funcs in executor.map(_parse_single_file, files_content.items()):
             results.extend(funcs)
-            
+
+    i = 0    
+    for func in results:
+        func.id = i
+        i += 1
+
     if cache_path:
         print(f"(info) [extract_functions] Saving extracted functions to cache: {cache_path}")
         os.makedirs(os.path.dirname(os.path.abspath(cache_path)), exist_ok=True)
@@ -100,16 +105,14 @@ if __name__ == "__main__":
     
     start_time = time.time()
     function_infos = extract_functions_from_files()
-    print(f"Total functions extracted: {len(function_infos)}")
-    print(f"Time taken to extract functions: {time.time() - start_time:.2f} seconds")
+    print(f"(info) [extract_functions] Total functions extracted: {len(function_infos)}")
+    print(f"(info) [extract_functions] Time taken to extract functions: {time.time() - start_time:.2f} seconds")
 
-    # 随机显示2个函数的 FunctionInfo
+    # 随机显示1个函数的 FunctionInfo
     import random
-    if function_infos:
-        sample_funcs = random.sample(function_infos, min(2, len(function_infos)))
-        for func in sample_funcs:
-            print("-" * 40)
-            print(f"File Path: {func.path}")
-            print(f"Lines: {func.start_line} - {func.end_line}")
-            print(f"Code Snippet: \n{func.code_snippet}")
-            print(f"Embedding: {func.embedding}")
+    func = random.choice(function_infos)
+    print(f"\n=== Sample FunctionInfo ===")
+    print(f"\nFunction ID: {func.id}")
+    print(f"File Path: {func.path}")
+    print(f"Lines: {func.start_line} - {func.end_line}")
+    print(f"Code Snippet: \n{func.code_snippet}")

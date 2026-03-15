@@ -5,7 +5,7 @@ import javalang.tree
 import javalang.tokenizer
 import javalang.parse
 
-from utils.java_code.function_info import FunctionInfo
+from utils.data_class.function_info import FunctionInfo
 
 
 class JavaParser:
@@ -77,6 +77,7 @@ class JavaParser:
                     code_snippet = "".join(snippet_lines).strip()
                     functions.append(
                         FunctionInfo(
+                            id=-1,
                             start_line=start_line,
                             end_line=end_line,
                             code_snippet=code_snippet,

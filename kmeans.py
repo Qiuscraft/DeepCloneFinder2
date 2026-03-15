@@ -5,13 +5,13 @@
 import os
 import pickle
 import time
-from typing import List
 
 import numpy as np
 
 import config
 from extract_functions import extract_functions_from_files
-from utils.java_code.function_info import FunctionInfo
+from utils.data_class.function_info import FunctionInfo
+from utils.data_class.kmeans_result import KMeansResult
 
 try:
     import faiss  # type: ignore
@@ -29,10 +29,6 @@ def _check_gpu_availability() -> None:
             print("(warning) [kmeans] No GPU detected")
     except Exception as e:
         print(f"(error) [kmeans] Error checking GPU: {e}")
-
-def _load_data() -> List[FunctionInfo]:
-    print("(info) [kmeans] Loading embeddings")
-    return extract_functions_from_files()
 
 def _kmeans_train(x: np.ndarray, n_centroids: int, n_iter: int, n_redo: int, verbose: bool, use_gpu: bool) -> faiss.Kmeans:
     print(f"(info) [kmeans] Training FAISS KMeans (k={n_centroids}, iter={n_iter})")
@@ -64,22 +60,14 @@ def _kmeans_train(x: np.ndarray, n_centroids: int, n_iter: int, n_redo: int, ver
     return kmeans
 
 def main() -> None:
-    print("(info) [kmeans] Starting clustering")
-    
     _check_gpu_availability()
     
     start_time = time.time()
     
-    # 提取及加载所有的 FunctionInfo
-    function_infos = _load_data()
-    if not function_infos:
-        print("(error) [kmeans] No data loaded, exiting")
-        return
-        
-    print(f"(info) [kmeans] Loaded {len(function_infos)} functions")
-    
+    print("(info) [kmeans] Loading function embeddings")
+    function_embeddings = pickle.load(open(os.path.expanduser(config.emb_cache_filepath), 'rb'))
     vectors = []
-    for func in function_infos:
+    for func in function_embeddings:
         vectors.append(func.embedding)
         
     x = np.vstack(vectors).astype("float32")
@@ -109,15 +97,16 @@ def main() -> None:
     distances, centroids = kmeans.index.search(x, 1)
     print("(info) [kmeans] Assignment completed")
     
-    for i, func in enumerate(function_infos):
-        func.centroid = int(centroids[i, 0])
-        func.distance = float(distances[i, 0])
+    kmeans_result = []
+
+    for i, _ in enumerate(centroids):
+        kmeans_result.append(KMeansResult(i, int(centroids[i, 0]), float(distances[i, 0])))
     
     print("(info) [kmeans] Saving cache")
-    cache_path = os.path.expanduser(config.ef_cache_filepath)
+    cache_path = config.kmeans_cache_filepath
     os.makedirs(os.path.dirname(os.path.abspath(cache_path)), exist_ok=True)
     with open(cache_path, 'wb') as f:
-        pickle.dump(function_infos, f)
+        pickle.dump(kmeans_result, f)
     print(f"(info) [kmeans] Saved to {cache_path}")
         
     print(f"(info) [kmeans] Finished in {time.time() - start_time:.2f}s")

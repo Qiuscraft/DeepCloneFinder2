@@ -34,6 +34,7 @@ python embedding.py
 python kmeans.py
 python init_clone_classes.py
 python generate_batch_requests.py
+python batch_upload.py
 ```
 
 ## 项目结构
