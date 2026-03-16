@@ -39,3 +39,7 @@ bd_merged_filepath = f"./batch/{os.path.basename(os.path.expanduser(ef_dataset_p
 
 # Import LLM Results
 illm_batch_size = 10000 # 每批次处理的记录数
+
+# Generate Final CSV
+gfc_output_csv = f"./batch/{os.path.basename(os.path.expanduser(ef_dataset_path))}_final_clones_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.csv" # 最终克隆对 CSV 输出路径
+

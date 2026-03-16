@@ -37,6 +37,7 @@ python generate_batch_requests.py
 python batch_upload.py
 python batch_download.py
 python import_llm_results.py
+python generate_final_csv.py
 ```
 
 ## 项目结构
