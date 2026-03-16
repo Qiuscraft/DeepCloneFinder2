@@ -36,3 +36,6 @@ bu_max_part_file_lines = 50000
 # Batch Download
 bd_download_dir = f"./batch/downloads/{os.path.basename(os.path.expanduser(ef_dataset_path))}_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}" # 下载结果的输出目录
 bd_merged_filepath = f"./batch/{os.path.basename(os.path.expanduser(ef_dataset_path))}_output_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.jsonl" # 合并后的结果文件路径
+
+# Import LLM Results
+illm_batch_size = 10000 # 每批次处理的记录数
