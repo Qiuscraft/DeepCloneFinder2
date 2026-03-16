@@ -23,9 +23,6 @@ def main():
     
     with open(config.gfc_output_csv, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
-        # Write header
-        writer.writerow(["cf1_subdirectory", "cf1_filename", "cf1_startline", "cf1_endline", 
-                         "cf2_subdirectory", "cf2_filename", "cf2_startline", "cf2_endline"])
         
         pair_count = 0
         for cc in tqdm(clone_classes, desc="(info) [generate_final_csv] Generating clone pairs"):
