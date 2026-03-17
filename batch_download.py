@@ -321,9 +321,9 @@ if __name__ == "__main__":
     print("(info) [batch_download] Loading batch_id list...")
     batch_ids = load_batch_ids(config.bu_batch_ids_filepath)
     print("(info) [batch_download] Getting output_file_id list...")
-    output_file_ids = get_output_file_ids(batch_ids)
+    output_file_ids = get_output_file_ids(batch_ids, config.zai_api_key)
     print("(info) [batch_download] Downloading output files...")
-    downloaded_files = download_output_files(output_file_ids, config.bd_download_dir)
+    downloaded_files = download_output_files(output_file_ids, config.bd_download_dir, config.zai_api_key)
     successful_downloads = [f for f in downloaded_files if f]
     print(f"(info) [batch_download] Total files downloaded: {len(successful_downloads)}, Saved in directory: {config.bd_download_dir}")
     print(f"(info) [batch_download] Merging files to: {config.bd_merged_filepath} ...")
