@@ -9,8 +9,6 @@ import time
 import numpy as np
 
 import config
-from extract_functions import extract_functions_from_files
-from utils.data_class.function_info import FunctionInfo
 from utils.data_class.kmeans_result import KMeansResult
 
 try:
