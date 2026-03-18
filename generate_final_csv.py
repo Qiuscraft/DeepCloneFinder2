@@ -12,8 +12,8 @@ def main():
     with open(config.ef_cache_filepath, "rb") as f:
         function_infos = pickle.load(f)
         
-    print(f"(info) [generate_final_csv] Loading clone classes from {config.icc_cache_filepath}...")
-    with open(config.icc_cache_filepath, "rb") as f:
+    print(f"(info) [generate_final_csv] Loading clone classes from {config.clone_class_filepath}...")
+    with open(config.clone_class_filepath, "rb") as f:
         clone_classes = pickle.load(f)
         
     print(f"(info) [generate_final_csv] Generating clone pairs to {config.gfc_output_csv}...")

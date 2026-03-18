@@ -160,13 +160,13 @@ def process_llm_results_file(file_path):
     
     return results
 
-def update_clone_classes(results, filepath=config.icc_cache_filepath):
+def update_clone_classes(results, filepath=config.clone_class_filepath):
     """
     根据给定的解析结果更新克隆类列表。
 
     Args:
         results: 包含解析后LLM结果的列表
-        filepath: 克隆类列表的缓存文件路径，默认为config.icc_cache_filepath
+        filepath: 克隆类列表的缓存文件路径，默认为config.clone_class_filepath
 
     Returns:
         更新后的克隆类列表
@@ -203,7 +203,7 @@ if __name__ == "__main__":
     clone_classes = update_clone_classes(results)
     
     # 将更新后的克隆类列表持久化保存
-    output_filepath = config.icc_cache_filepath
+    output_filepath = config.clone_class_filepath
     print(f"(info) [import_llm_results] Saving updated clone classes to {output_filepath}...")
     with open(output_filepath, 'wb') as f:
         pickle.dump(clone_classes, f)

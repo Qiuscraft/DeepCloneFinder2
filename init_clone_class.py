@@ -59,8 +59,8 @@ def init_clone_classes() -> List[Optional[CloneClass]]:
 
 if __name__ == "__main__":
     cache_path = None
-    if hasattr(config, "icc_cache_filepath") and config.icc_cache_filepath:
-        cache_path = os.path.expanduser(config.icc_cache_filepath)
+    if hasattr(config, "clone_class_filepath") and config.clone_class_filepath:
+        cache_path = os.path.expanduser(config.clone_class_filepath)
 
     if cache_path and os.path.exists(cache_path):
         with open(cache_path, "rb") as f:
@@ -76,7 +76,7 @@ if __name__ == "__main__":
                 pickle.dump(clone_classes, f)
             print(f"(info) [init_clone_classes] Data successfully saved to {cache_path}")
         else:
-            print(f"(error) [init_clone_classes] Error: icc_cache_filepath not found in config.")
+            print(f"(error) [init_clone_classes] Error: clone_class_filepath not found in config.")
 
     valid_classes = [cc for cc in clone_classes if cc is not None]
     if valid_classes:

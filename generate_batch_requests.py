@@ -33,8 +33,8 @@ def main():
     print("=== 代码克隆检测批量请求生成器 ===")
     
     cache_path = None
-    if hasattr(config, "icc_cache_filepath") and config.icc_cache_filepath:
-        cache_path = os.path.expanduser(config.icc_cache_filepath)
+    if hasattr(config, "clone_class_filepath") and config.clone_class_filepath:
+        cache_path = os.path.expanduser(config.clone_class_filepath)
 
     if not cache_path or not os.path.exists(cache_path):
         print(f"错误: CloneClass 缓存文件 {cache_path} 不存在，请先运行 init_clone_class.py")

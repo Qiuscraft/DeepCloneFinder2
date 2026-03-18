@@ -18,8 +18,8 @@ kmeans_verbose = True # 是否在 KMeans 训练过程中输出详细日志，默
 kmeans_use_gpu = True # 是否使用 GPU 加速 KMeans 训练，默认为 True，如果设置为 True 但未检测到 GPU，则会自动降级为 CPU 模式并输出警告
 kmeans_cache_filepath = f"./cache/{os.path.basename(os.path.expanduser(ef_dataset_path))}_kmeans_result_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.pkl" # KMeans 结果的缓存文件路径
 
-# Init Clone Classes
-icc_cache_filepath = f"./cache/{os.path.basename(os.path.expanduser(ef_dataset_path))}_clone_classes_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.pkl" # 克隆类持久化文件路径
+# Clone Classes
+clone_class_filepath = f"./cache/{os.path.basename(os.path.expanduser(ef_dataset_path))}_clone_classes_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.pkl" # 克隆类持久化文件路径
 
 # Generate Batch Requests
 gbr_output_file = f"./batch/{os.path.basename(os.path.expanduser(ef_dataset_path))}_centroid{kmeans_n_centroids}_iter{kmeans_n_iter}_redo{kmeans_n_redo}.jsonl" # 生成的 JSONL 文件的输出文件路径
