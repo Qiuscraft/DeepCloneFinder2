@@ -32,7 +32,7 @@ pytest
 python extract_functions.py
 python embedding.py
 python kmeans.py
-python init_clone_classes.py
+python init_clone_class.py
 python generate_batch_requests.py
 python batch_upload.py
 python batch_download.py
